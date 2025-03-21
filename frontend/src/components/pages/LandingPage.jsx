@@ -4,24 +4,16 @@ import TestImage from "../../assets/d.png";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
 
-import axios from "axios";
-
 const LandingPage = () => {
 
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleRecipeSearch = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/recipe/getRecipe")
-    } catch (error) {
-      console.log(error);
-    }
+   if (searchTerm.trim()) { 
+    navigate(`/search?query=${searchTerm}`)
+   }
   };
-
-  useEffect(() => {
-    handleRecipeSearch();
-  }, []);
 
   return (
     <div className="w-full h-screen overflow-hidden grid grid-rows-[auto_1fr]">

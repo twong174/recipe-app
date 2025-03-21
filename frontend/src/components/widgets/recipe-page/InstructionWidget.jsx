@@ -1,6 +1,6 @@
 import React from "react";
 
-const InstructionWidget = () => {
+const InstructionWidget = ({instructions}) => {
   return (
     <div className="rounded-md p-4 flex items-center gap-4 bg-white">
       <p className="font-medium text-xl">01</p>
