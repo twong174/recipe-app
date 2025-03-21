@@ -16,7 +16,7 @@ const getRecipe = async (req, res) => {
 const getRecipeDetails = async (req, res) => {
   const { id } = req.params;
 
-  const URL = `https://api.spoonacular.com/recipes/${id}/information?apiKey=${process.env.API_KEY}`;
+  const URL = `https://api.spoonacular.com/recipes/${id}/information?apiKey=${process.env.API_KEY}&includeNutrition=true`;
 
   try {
     const response = await axios.get(URL);

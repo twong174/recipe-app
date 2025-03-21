@@ -111,7 +111,7 @@ const RecipePage = () => {
         {/* Ingredients and Nutritional Info */}
         <div className="grid grid-cols-[80%_auto] gap-4">
           <IngredientsWidget ingredients={recipeData.extendedIngredients} />
-          <NutritionalInfoWidget />
+          <NutritionalInfoWidget nutrition={recipeData.nutrition.nutrients}/>
         </div>
 
         {/* Cooking Instructions */}
