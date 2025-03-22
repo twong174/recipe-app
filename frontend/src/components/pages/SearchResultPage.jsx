@@ -10,7 +10,7 @@ const SearchResultPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [recipes, setRecipes] = useState([]);
+  const [recipeResults, setRecipeResults] = useState([]);
 
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get("query");
@@ -18,10 +18,10 @@ const SearchResultPage = () => {
   const fetchRecipes = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/recipe/getRecipe?searchTerm=${query}`
+        `http://localhost:3000/api/recipe/getRecipeResults?searchTerm=${query}`
       );
 
-      setRecipes(response.data.results);
+      setRecipeResults(response.data.results);
     } catch (error) {
       console.log(error);
     }
@@ -59,7 +59,7 @@ const SearchResultPage = () => {
         </div>
 
         <div className="grid grid-cols-4 gap-2">
-          {recipes.map((recipe) => (
+          {recipeResults.map((recipe) => (
             <RecipeWidget
               key={recipe.id}
               title={recipe.title}

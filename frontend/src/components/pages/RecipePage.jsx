@@ -13,34 +13,38 @@ const RecipePage = () => {
   const { id } = useParams(); // Extract id from route parameters
   const navigate = useNavigate();
   const [recipeData, setRecipeData] = useState(null);
-  const [error, setError] = useState(null);
+  const [recipeInstructions, setRecipeInstructions] = useState(null);
+
+  const fetchRecipeInstructions = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/recipe/getRecipeInstructions/${id}`
+      );
+
+      setRecipeInstructions(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const fetchRecipeData = async () => {
     try {
       const response = await axios.get(
         `http://localhost:3000/api/recipe/getRecipeDetails/${id}`
       );
-      setRecipeData(response.data); // Set the fetched recipe data
-      setError(null); // Clear any previous errors
+
+      setRecipeData(response.data);
     } catch (error) {
-      console.error("Error fetching recipe data:", error);
-      setError("Failed to load recipe details. Please try again later.");
+      console.log(error);
     }
   };
 
   useEffect(() => {
     if (id) {
       fetchRecipeData();
+      fetchRecipeInstructions();
     }
   }, [id]);
-
-  if (error) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
-  }
 
   if (!recipeData) {
     return <div>Loading...</div>; // Show a loading state while fetching data
@@ -77,7 +81,7 @@ const RecipePage = () => {
         <div className="flex justify-between items-center">
           <LabelWidget
             labelTitle={"Cuisine"}
-            labelDescription={"Mexican Food"} // Replace with dynamic data if available
+            labelDescription={`${recipeData.cuisines}`} // Replace with dynamic data if available
           />
           <LabelWidget
             labelTitle={"Servings"}
@@ -92,8 +96,8 @@ const RecipePage = () => {
             labelDescription={`${recipeData.cookingMinutes} Minutes`}
           />
           <LabelWidget
-            labelTitle={"Difficulty"}
-            labelDescription={"Intermediate Level"} // Replace with dynamic data if available
+            labelTitle={"Health Score"}
+            labelDescription={`${recipeData.healthScore}`} // Replace with dynamic data if available
           />
         </div>
 
@@ -109,15 +113,26 @@ const RecipePage = () => {
         </div>
 
         {/* Ingredients and Nutritional Info */}
-        <div className="grid grid-cols-[80%_auto] gap-4">
-          <IngredientsWidget ingredients={recipeData.extendedIngredients} />
-          <NutritionalInfoWidget nutrition={recipeData.nutrition.nutrients}/>
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <IngredientsWidget ingredients={recipeData.extendedIngredients} />
+          </div>
+          <div className="self-start">
+            <NutritionalInfoWidget nutrition={recipeData.nutrition.nutrients} />
+          </div>
         </div>
 
         {/* Cooking Instructions */}
         <div className="flex flex-col gap-2">
           <h1 className="font-medium text-2xl">Cooking Instructions</h1>
-          <InstructionWidget instructions={recipeData.instructions} />
+
+          {recipeInstructions?.[0]?.steps?.map((instruction, index) => (
+            <InstructionWidget
+              key={index}
+              step={instruction.step}
+              number={instruction.number}
+            />
+          ))}
         </div>
 
         {/* Divider */}
