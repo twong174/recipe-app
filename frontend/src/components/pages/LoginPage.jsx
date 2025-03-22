@@ -1,12 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const LoginPage = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  const login = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/login",
+        {
+          username,
+          password,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.data.authenticated) {
+        alert(`Welcome ${response.data.user.first_name}`);
+        navigate("/"); 
+      }
+    } catch (error) {
+      alert(error.message);
+      console.error("Login error:", error);
+      setError(error.response?.data?.message || "Login failed");
+    }
+  };
+
   return (
     <div className="w-full h-screen grid grid-cols-[60%_auto]">
-      <div className=" flex items-center justify-center bg-gray-50">
+      <div className="flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-2">
           <h1 className="font-medium text-6xl">Recipify</h1>
-          <p className="text-gray-700"> Your all in one recipe app</p>
+          <p className="text-gray-700">Your all-in-one recipe app</p>
         </div>
       </div>
       <div className="flex flex-col p-5 items-center justify-center">
@@ -17,15 +47,26 @@ const LoginPage = () => {
           <input
             type="text"
             placeholder="johndoe123"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="border border-gray-300 shadow-xs text-sm p-2 bg-white rounded-md w-full outline-none"
           />
+
           <p className="text-xs font-medium">Password</p>
           <input
-            type="text"
+            type="password"
             placeholder="Password123"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-300 shadow-xs text-sm p-2 bg-white rounded-md w-full outline-none"
           />
-          <button className="rounded-md cursor-pointer bg-gray-700 text-white w-full text-sm p-2 font-light mt-4">
+
+          {error && <p className="text-red-500 text-xs">{error}</p>}
+
+          <button
+            onClick={login}
+            className="rounded-md cursor-pointer bg-gray-700 text-white w-full text-sm p-2 font-light mt-4"
+          >
             Login
           </button>
         </div>

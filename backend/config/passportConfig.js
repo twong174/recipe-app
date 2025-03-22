@@ -4,7 +4,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const db = require("../models/db");
 
 passport.use(
-  new LocalStrategy(async (username, password, done) => {
+  new LocalStrategy({usernameField: "username"}, async (username, password, done) => {
     try {
       const { rows } = await db.query(
         "SELECT * FROM users WHERE username = $1",
