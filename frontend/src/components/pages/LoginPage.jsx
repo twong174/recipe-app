@@ -1,33 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const LoginPage = () => {
+  const { user, login, isAuthenticated } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  const login = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
-        {
-          username,
-          password,
-        },
-        { withCredentials: true }
-      );
+  const handlelogin = async () => {
+    if (!username || !password) return;
 
-      if (response.data.authenticated) {
-        alert(`Welcome ${response.data.user.first_name}`);
-        navigate("/"); 
-      }
-    } catch (error) {
-      alert(error.message);
-      console.error("Login error:", error);
-      setError(error.response?.data?.message || "Login failed");
+    const response = await login(username, password);
+    if (isAuthenticated) {
+      navigate("/");
+      alert("Succesfully logged in!");
+      console.log(user);
+      console.log(isAuthenticated);
+    } else {
+      alert(response.message);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && username && password) {
+      handlelogin();
     }
   };
 
@@ -49,6 +48,7 @@ const LoginPage = () => {
             placeholder="johndoe123"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="border border-gray-300 shadow-xs text-sm p-2 bg-white rounded-md w-full outline-none"
           />
 
@@ -58,13 +58,12 @@ const LoginPage = () => {
             placeholder="Password123"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="border border-gray-300 shadow-xs text-sm p-2 bg-white rounded-md w-full outline-none"
           />
 
-          {error && <p className="text-red-500 text-xs">{error}</p>}
-
           <button
-            onClick={login}
+            onClick={handlelogin}
             className="rounded-md cursor-pointer bg-gray-700 text-white w-full text-sm p-2 font-light mt-4"
           >
             Login

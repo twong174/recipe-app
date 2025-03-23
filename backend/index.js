@@ -19,7 +19,7 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 // Session configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "your-secret-key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false, httpOnly: true },

@@ -14,6 +14,7 @@ const RecipePage = () => {
   const navigate = useNavigate();
   const [recipeData, setRecipeData] = useState(null);
   const [recipeInstructions, setRecipeInstructions] = useState(null);
+  const [similarRecipeData, setSimilarRecipeData] = useState(null);
 
   const fetchRecipeInstructions = async () => {
     try {
@@ -39,10 +40,35 @@ const RecipePage = () => {
     }
   };
 
+  const fetchSimilarRecipes = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/recipe/getSimilarRecipes/${id}`
+      );
+
+      setSimilarRecipeData(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const saveRecipe = async () => {
+    try { 
+      const response = await axios.get(
+        `http://localhost:3000/api/recipe/saveRecipes/${id}`
+      );
+
+      
+    } catch (error) { 
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchRecipeData();
       fetchRecipeInstructions();
+      fetchSimilarRecipes();
     }
   }, [id]);
 
@@ -141,10 +167,9 @@ const RecipePage = () => {
         {/* Related Recipes */}
         <h1 className="text-2xl font-medium">Related Recipes</h1>
         <div className="grid grid-cols-4 gap-2">
-          <RecipeWidget />
-          <RecipeWidget />
-          <RecipeWidget />
-          <RecipeWidget />
+          {similarRecipeData?.slice(0, 4).map((recipe, index) => (
+            <RecipeWidget key={index} title={recipe.title} id={recipe.id} />
+          ))}
         </div>
       </main>
     </div>
