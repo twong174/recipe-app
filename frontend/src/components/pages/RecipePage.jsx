@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import LabelWidget from "../widgets/recipe-page/LabelWidget";
@@ -7,14 +8,21 @@ import NutritionalInfoWidget from "../widgets/recipe-page/NutritionalInfoWidget"
 import InstructionWidget from "../widgets/recipe-page/InstructionWidget";
 import RecipeWidget from "../widgets/RecipeWidget";
 import SaveAltOutlinedIcon from "@mui/icons-material/SaveAltOutlined";
+
+import BeenhereIcon from "@mui/icons-material/Beenhere";
 import axios from "axios";
 
 const RecipePage = () => {
   const { id } = useParams(); // Extract id from route parameters
   const navigate = useNavigate();
+  const { user, checkAuth, isAuthenticated } = useContext(AuthContext);
+
   const [recipeData, setRecipeData] = useState(null);
   const [recipeInstructions, setRecipeInstructions] = useState(null);
   const [similarRecipeData, setSimilarRecipeData] = useState(null);
+
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const fetchRecipeInstructions = async () => {
     try {
@@ -53,14 +61,34 @@ const RecipePage = () => {
   };
 
   const saveRecipe = async () => {
-    try { 
-      const response = await axios.get(
-        `http://localhost:3000/api/recipe/saveRecipes/${id}`
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/recipe/saveRecipe",
+        {
+          title: recipeData.title,
+          recipeId: id,
+          userId: user.id,
+        }
       );
 
-      
-    } catch (error) { 
-      console.log(error);
+      if (response.status === 201) {
+        setIsSaved(true);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setIsSaved(true);
+      } else {
+        console.error("Error saving recipe:", error);
+        alert("Failed to saved recipe");
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -71,6 +99,29 @@ const RecipePage = () => {
       fetchSimilarRecipes();
     }
   }, [id]);
+
+  useEffect(() => {
+    const checkIfSaved = async () => {
+      if (isAuthenticated && user && id) {
+        try {
+          const response = await axios.get(
+            "http://localhost:3000/api/recipe/checkSavedRecipe",
+            {
+              params: {
+                recipeId: id,
+                userId: user.id,
+              },
+            }
+          );
+          setIsSaved(response.data.isSaved);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+
+    checkIfSaved();
+  }, [id, user, isAuthenticated]);
 
   if (!recipeData) {
     return <div>Loading...</div>; // Show a loading state while fetching data
@@ -92,8 +143,19 @@ const RecipePage = () => {
         {/* White Rounded Container */}
         <div className="p-10 bg-white rounded-md relative">
           {/* Save Icon Container */}
-          <div className="absolute top-4 right-4 bg-gray-700 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer">
-            <SaveAltOutlinedIcon fontSize="" className="text-white" />
+          <div
+            className={`absolute top-4 right-4 ${
+              isSaved ? "bg-green-600" : "bg-gray-700"
+            } w-8 h-8 flex items-center justify-center rounded-full cursor-pointer`}
+            onClick={saveRecipe}
+            disabled={isSaving || isSaved}
+            title={isSaved ? "Recipe saved!" : "Save this recipe"}
+          >
+            {isSaved ? (
+              <BeenhereIcon fontSize="" className="text-white" />
+            ) : (
+              <SaveAltOutlinedIcon fontSize="" className="text-white" />
+            )}
           </div>
 
           {/* Content */}

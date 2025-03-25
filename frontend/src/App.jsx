@@ -8,6 +8,7 @@ import RegisterPage from "./components/pages/RegisterPage";
 import LoginPage from "./components/pages/LoginPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute"; // Import the PublicRoute component
+import SearchResultSkeleton from "./components/skeleton/SearchResultSkeleton";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/create-recipes" element={<CreateRecipesPage />} />
           <Route path="/recipe/:id" element={<RecipePage />} />
           <Route path="/search" element={<SearchResultPage />} />
+          <Route path="/skeleton" element={<SearchResultSkeleton />} />
         </Route>
       </Routes>
     </Router>

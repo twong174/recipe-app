@@ -94,10 +94,25 @@ const saveRecipe = async (req, res) => {
   }
 };
 
+const checkSavedRecipe = async (req, res) => {
+  try {
+    const { recipeId, userId } = req.query;
+
+    const checkQuery = `SELECT * FROM saved_recipes WHERE recipe_id = $1 AND user_id = $2`;
+
+    const result = await db.query(checkQuery, [recipeId, userId]);
+
+    res.json({ isSaved: result.rows.length > 0 });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getRecipeResults,
   getRecipeInstructions,
   getRecipeDetails,
   getSimilarRecipes,
   saveRecipe,
+  checkSavedRecipe,
 };
