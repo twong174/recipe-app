@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import PublishIcon from "@mui/icons-material/Publish";
 
@@ -7,6 +7,13 @@ import RecipeDetailWidget from "../widgets/RecipeDetailWidget";
 import RecipeDirectionsWidget from "../widgets/RecipeDirectionsWidget";
 
 const CreateRecipesPage = () => {
+
+  const [recipeName, setRecipeName] = useState("");
+  const [servingCount, setServingCount] = useState(0);
+  const [cookTime, setCookTime] = useState("");
+  const [ingredients, setIngredients] = useState([]);
+  const [directions, setDirections] = useState([]);
+
   return (
     <div className="w-full h-screen grid grid-rows-[auto_1fr]">
       <header className="w-full p-2 border-b border-gray-300 flex items-center justify-between">
@@ -25,7 +32,6 @@ const CreateRecipesPage = () => {
         </div>
       </header>
       <main className="w-full h-full bg-gray-50 grid grid-cols-[40%_auto] grid-rows-2 gap-4 p-4">
-        
         <div className="row-span-2 flex flex-col gap-2">
           <h1 className="tracking-wider text-xs font-medium text-gray-700">
             RECIPE GENERAL INFORMATION
